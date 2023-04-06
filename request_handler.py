@@ -1,7 +1,7 @@
 """main module"""
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size
+from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size, create_order
 
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -44,8 +44,13 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
-        response = {"payload": post_body}
-        self.wfile.write(json.dumps(response).encode())
+        # response = {"payload": post_body}
+        post_body = json.loads(post_body)
+        (resource, id) = self.parse_url(self.path)
+        new_order = None
+        if resource == "orders":
+            new_order = create_order(post_body)
+            self.wfile.write(json.dumps(new_order).encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server """
