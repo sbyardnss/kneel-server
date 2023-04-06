@@ -30,3 +30,11 @@ SIZES = [
 def get_all_sizes():
     """function for getting all sizes"""
     return SIZES
+
+def get_single_size(id):
+    """function for getting single size"""
+    requested_size = None
+    for size in SIZES:
+        if size["id"] == id:
+            requested_size = size
+    return requested_size

@@ -31,3 +31,12 @@ METALS = [
 def get_all_metals():
     """function for getting all metals"""
     return METALS
+
+
+def get_single_metal(id):
+    """function for getting single metal"""
+    requested_metal = None
+    for metal in METALS:
+        if metal["id"] == id:
+            requested_metal = metal
+    return requested_metal
