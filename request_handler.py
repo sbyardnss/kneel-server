@@ -9,7 +9,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests to the server """
-        self._set_headers(200)
         response = {}
         (resource, id) = self.parse_url(self.path)
 
@@ -18,21 +17,41 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_single_metal(id)
             else:
                 response = get_all_metals()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": "That metal is unavailable"}
+            else:
+                self._set_headers(200)
         elif resource == "sizes":
             if id is not None:
                 response = get_single_size(id)
             else:
                 response = get_all_sizes()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": "That size is unavailable"}
+            else:
+                self._set_headers(200)
         elif resource == "styles":
             if id is not None:
                 response = get_single_style(id)
             else:
                 response = get_all_styles()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": "That style is unavailable"}
+            else:
+                self._set_headers(200)
         elif resource == "orders":
             if id is not None:
                 response = get_single_order(id)
             else:
                 response = get_all_orders()
+            if response is None:
+                self._set_headers(404)
+                response = {"message": "That order was never placed, or was cancelled"}
+            else:
+                self._set_headers(200)
         # else:
         #     response = []
 

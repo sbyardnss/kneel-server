@@ -1,10 +1,13 @@
+from .metal_requests import get_single_metal
+from .size_requests import get_single_size
+from .style_requests import get_single_style
 """order requests module"""
 ORDERS = [
     {
         "id": 1,
-        "metal": 3,
-        "size": 2,
-        "style": 1
+        "metalId": 3,
+        "sizeId": 2,
+        "styleId": 1
     }
 ]
 
@@ -20,6 +23,12 @@ def get_single_order(id):
     for order in ORDERS:
         if order["id"] == id:
             requested_order = order
+            requested_order["metal"] = get_single_metal(order["metalId"])
+            requested_order["size"] = get_single_size(order["sizeId"])
+            requested_order["style"] = get_single_style(order["styleId"])
+            requested_order.pop("styleId", None)
+            requested_order.pop("sizeId", None)
+            requested_order.pop("metalId", None)
     return requested_order
 
 
