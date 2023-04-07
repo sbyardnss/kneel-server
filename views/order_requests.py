@@ -1,5 +1,12 @@
 """order requests module"""
-ORDERS = []
+ORDERS = [
+    {
+        "id": 1,
+        "metal": "Sterling Silver",
+        "size": "carets: 0.5",
+        "style": "Classic"
+    }
+]
 
 
 def get_all_orders():
@@ -28,3 +35,19 @@ def create_order(order):
     order["id"] = new_id
     ORDERS.append(order)
     return order
+
+def delete_order(id):
+    """function for deleting an order obj"""
+    order_index = -1
+    for index, order in enumerate(ORDERS):
+        if order["id"] == id:
+            order_index = index
+    if order_index >= 0:
+        ORDERS.pop(order_index)
+
+def update_order(id, new_order):
+    """function for updating an existing order"""
+    for index, order in enumerate(ORDERS):
+        if order["id"] == id:
+            ORDERS[index] = new_order
+            break
