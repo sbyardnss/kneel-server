@@ -49,28 +49,36 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_all_orders()
             if response is None:
                 self._set_headers(404)
-                response = {"message": "That order was never placed, or was cancelled"}
+                response = {
+                    "message": "That order was never placed, or was cancelled"}
             else:
                 self._set_headers(200)
         # else:
         #     response = []
 
-
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
         """Handles POST requests to the server """
-        self._set_headers(201)
 
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         # response = {"payload": post_body}
         post_body = json.loads(post_body)
+        response = {}
         (resource, id) = self.parse_url(self.path)
         new_order = None
         if resource == "orders":
-            new_order = create_order(post_body)
-            self.wfile.write(json.dumps(new_order).encode())
+            if "metalId" in post_body and "styleId" in post_body and "sizeId" in post_body:
+                new_order = create_order(post_body)
+                self._set_headers(201)
+                response = new_order
+            else:
+                self._set_headers(400)
+                response = {
+                    "message": f'{"metalId is required" if "metalId" not in post_body else ""} {"styleId is required" if "styleId" not in post_body else ""} {"sizeId is required" if "sizeId" not in post_body else ""}'
+                }
+        self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server """
