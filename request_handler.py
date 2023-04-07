@@ -93,12 +93,14 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
         """function for handling delete request"""
-        self._set_headers(204)
         (resource, id) = self.parse_url(self.path)
         if resource == "orders":
-            delete_order(id)
-            self.wfile.write("".encode())
-
+            self._set_headers(405)
+            # delete_order(id)
+            response = {
+                "message": "Cannot delete this order as it has already been fulfilled"
+            }
+            self.wfile.write(json.dumps(response).encode())
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
         headers on the response
