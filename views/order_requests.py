@@ -2,9 +2,9 @@
 ORDERS = [
     {
         "id": 1,
-        "metal": "Sterling Silver",
-        "size": "carets: 0.5",
-        "style": "Classic"
+        "metal": 3,
+        "size": 2,
+        "style": 1
     }
 ]
 
