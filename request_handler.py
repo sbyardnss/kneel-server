@@ -42,7 +42,10 @@ class HandleRequests(BaseHTTPRequestHandler):
         new_asset = None
         new_asset = create(resource, post_body)
         response = new_asset
-        required_attr = retrieve(resource, 1).keys()
+        target_table = all(resource)
+        length = len(target_table)
+        last_index = length - 1
+        required_attr = retrieve(resource, last_index).keys()
         if new_asset.keys() == required_attr:
             self._set_headers(201)
             response = new_asset
@@ -51,29 +54,28 @@ class HandleRequests(BaseHTTPRequestHandler):
             self._set_headers(400)
             print(required_attr)
             response = f"not able. these attributes required {list(required_attr)}"
-        # new_order = None
-        # if resource == "orders":
-        #     if "metalId" in post_body and "styleId" in post_body and "sizeId" in post_body:
-        #         new_order = create_order(post_body)
-        #         self._set_headers(201)
-        #         response = new_order
-        #     else:
-        #         self._set_headers(400)
-        #         response = {
-        #             "message": f'{"metalId is required" if "metalId" not in post_body else ""} {"styleId is required" if "styleId" not in post_body else ""} {"sizeId is required" if "sizeId" not in post_body else ""}'
-        #         }
         self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
         """Handles PUT requests to the server """
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
         (resource, id) = self.parse_url(self.path)
-        if resource == "orders":
-            update_order(id, post_body)
+        target_table = all(resource)
+        length = len(target_table)
+        last_index = length - 1
+        required_attr = retrieve(resource, last_index).keys()
+        if post_body.keys() == required_attr:
+            self._set_headers(204)
+            update(resource, id, post_body)
             self.wfile.write("".encode())
+        else:
+            self._set_headers(400)
+            response = {
+                "message": f"not a valid replacement object. must have {list(required_attr)}"
+            }
+            return self.wfile.write(json.dumps(response).encode())
 
     def do_DELETE(self):
         """function for handling delete request"""
@@ -85,6 +87,13 @@ class HandleRequests(BaseHTTPRequestHandler):
                 "message": "Cannot delete this order as it has already been fulfilled"
             }
             self.wfile.write(json.dumps(response).encode())
+    
+    # def get_last_table_item(self, resource):
+    #     """function for getting last item in table to match attributes"""
+    #     target_table = all(resource)
+    #     length = len(target_table)
+    #     last_index = length - 1
+    #     return retrieve(resource, last_index)
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin

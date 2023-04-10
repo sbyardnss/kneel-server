@@ -104,11 +104,19 @@ def create(resource, resource_obj):
     return resource_obj
 
 
-def update():
+def update(resource, id, new_asset):
     """For PUT requests to a single resource"""
-    pass
+    for index, asset in enumerate(DATABASE[resource]):
+        if asset["id"] == id:
+            DATABASE[resource][index] = new_asset
+            break
 
 
-def delete():
+def delete(resource, id):
     """For DELETE requests to a single resource"""
-    pass
+    asset_index = -1
+    for index, asset in enumerate(DATABASE[resource]):
+        if asset["id"] == id:
+            asset_index = index
+        if asset_index >= 0:
+            DATABASE[resource].pop(asset_index)
