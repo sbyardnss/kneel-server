@@ -1,2 +1,7 @@
 {
+    "python.formatting.autopep8Path": "/Users/stephen/.pyenv/shims/autopep8",
+    "python.linting.pylintEnabled": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportGeneralTypeIssues": "none"
+    }
 }

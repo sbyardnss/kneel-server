@@ -1,7 +1,8 @@
 """main module"""
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size, create_order, delete_order, update_order
+from urllib.parse import urlparse
+from repository import all, retrieve, create, delete, update
 
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -9,53 +10,24 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests to the server """
-        response = {}
+        response = None
         (resource, id) = self.parse_url(self.path)
-
-        if resource == "metals":
-            if id is not None:
-                response = get_single_metal(id)
-            else:
-                response = get_all_metals()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": "That metal is unavailable"}
-            else:
+        if id is not None:
+            response = retrieve(resource, id)
+            if response is not None:
                 self._set_headers(200)
-        elif resource == "sizes":
-            if id is not None:
-                response = get_single_size(id)
             else:
-                response = get_all_sizes()
-            if response is None:
                 self._set_headers(404)
-                response = {"message": "That size is unavailable"}
-            else:
+                response = "not found"
+        else:
+            if resource is not None:
                 self._set_headers(200)
-        elif resource == "styles":
-            if id is not None:
-                response = get_single_style(id)
+                response = all(resource)
             else:
-                response = get_all_styles()
-            if response is None:
-                self._set_headers(404)
-                response = {"message": "That style is unavailable"}
-            else:
-                self._set_headers(200)
-        elif resource == "orders":
-            if id is not None:
-                response = get_single_order(id)
-            else:
-                response = get_all_orders()
-            if response is None:
                 self._set_headers(404)
                 response = {
-                    "message": "That order was never placed, or was cancelled"}
-            else:
-                self._set_headers(200)
-        # else:
-        #     response = []
-
+                    "message": "table not found"
+                }
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
@@ -67,17 +39,29 @@ class HandleRequests(BaseHTTPRequestHandler):
         post_body = json.loads(post_body)
         response = {}
         (resource, id) = self.parse_url(self.path)
-        new_order = None
-        if resource == "orders":
-            if "metalId" in post_body and "styleId" in post_body and "sizeId" in post_body:
-                new_order = create_order(post_body)
-                self._set_headers(201)
-                response = new_order
-            else:
-                self._set_headers(400)
-                response = {
-                    "message": f'{"metalId is required" if "metalId" not in post_body else ""} {"styleId is required" if "styleId" not in post_body else ""} {"sizeId is required" if "sizeId" not in post_body else ""}'
-                }
+        new_asset = None
+        new_asset = create(resource, post_body)
+        response = new_asset
+        required_attr = retrieve(resource, 1).keys()
+        if new_asset.keys() == required_attr:
+            self._set_headers(201)
+            response = new_asset
+            print(response)
+        else:
+            self._set_headers(400)
+            print(required_attr)
+            response = f"not able. these attributes required {list(required_attr)}"
+        # new_order = None
+        # if resource == "orders":
+        #     if "metalId" in post_body and "styleId" in post_body and "sizeId" in post_body:
+        #         new_order = create_order(post_body)
+        #         self._set_headers(201)
+        #         response = new_order
+        #     else:
+        #         self._set_headers(400)
+        #         response = {
+        #             "message": f'{"metalId is required" if "metalId" not in post_body else ""} {"styleId is required" if "styleId" not in post_body else ""} {"sizeId is required" if "sizeId" not in post_body else ""}'
+        #         }
         self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
@@ -101,6 +85,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 "message": "Cannot delete this order as it has already been fulfilled"
             }
             self.wfile.write(json.dumps(response).encode())
+
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
         headers on the response
