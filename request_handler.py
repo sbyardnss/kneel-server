@@ -80,14 +80,18 @@ class HandleRequests(BaseHTTPRequestHandler):
     def do_DELETE(self):
         """function for handling delete request"""
         (resource, id) = self.parse_url(self.path)
-        if resource == "orders":
-            self._set_headers(405)
-            # delete_order(id)
-            response = {
-                "message": "Cannot delete this order as it has already been fulfilled"
-            }
-            self.wfile.write(json.dumps(response).encode())
+        self._set_headers(204)
+        delete(resource, id)
+        self.wfile.write("".encode())
+        
+        # if resource == "orders":
+        #     self._set_headers(405)
+        #     # delete_order(id)
+        #     response = {
+        #         "message": "Cannot delete this order as it has already been fulfilled"
+        #     }
     
+        # self.wfile.write(json.dumps(response).encode())
     # def get_last_table_item(self, resource):
     #     """function for getting last item in table to match attributes"""
     #     target_table = all(resource)

@@ -118,5 +118,5 @@ def delete(resource, id):
     for index, asset in enumerate(DATABASE[resource]):
         if asset["id"] == id:
             asset_index = index
-        if asset_index >= 0:
-            DATABASE[resource].pop(asset_index)
+    if asset_index >= 0:
+        DATABASE[resource].pop(asset_index)
