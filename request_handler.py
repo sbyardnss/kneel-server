@@ -1,7 +1,7 @@
 """main module"""
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size, create_order, delete_order, update_order
+from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size, create_order, delete_order, update_order, update_metal
 
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -55,14 +55,25 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_PUT(self):
         """Handles PUT requests to the server """
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
         (resource, id) = self.parse_url(self.path)
+        response = {}
         if resource == "orders":
             update_order(id, post_body)
+            self._set_headers(204)
             self.wfile.write("".encode())
+        if resource == "metals":
+            response = update_metal(id, post_body)
+            if response is True:
+                self._set_headers(204)
+            else:
+                self._set_headers(404)
+                response = {
+                    'message': 'unknown entry'
+                }
+            self.wfile.write(json.dumps(response).encode())
 
     def do_DELETE(self):
         """function for handling delete request"""

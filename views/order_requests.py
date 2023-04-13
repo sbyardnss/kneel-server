@@ -28,7 +28,8 @@ def get_all_orders():
         orders = []
         dataset = db_cursor.fetchall()
         for row in dataset:
-            order = Order(row['id'], row['metal_id'], row['size_id'], row['style_id'])
+            order = Order(row['id'], row['metal_id'],
+                          row['size_id'], row['style_id'])
             orders.append(order.__dict__)
     return orders
 
@@ -46,9 +47,10 @@ def get_single_order(id):
             o.style_id
         FROM orders o
         WHERE o.id = ?
-        """, ( id, ))
+        """, (id, ))
         data = db_cursor.fetchone()
-        order = Order(data['id'], data['metal_id'], data['size_id'], data['style_id'])
+        order = Order(data['id'], data['metal_id'],
+                      data['size_id'], data['style_id'])
     return order.__dict__
 
 
@@ -66,14 +68,16 @@ def create_order(order):
         order['id'] = id
     return order
 
+
 def delete_order(id):
-    """function for deleting an order obj"""
-    order_index = -1
-    for index, order in enumerate(ORDERS):
-        if order["id"] == id:
-            order_index = index
-    if order_index >= 0:
-        ORDERS.pop(order_index)
+    """sql function for deleting order"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        DELETE FROM Orders
+        WHERE id = ?
+        """, (id, ))
+
 
 def update_order(id, new_order):
     """function for updating an existing order"""

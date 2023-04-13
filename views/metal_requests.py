@@ -1,3 +1,6 @@
+import json
+import sqlite3
+from models import Metal
 """metal requests module"""
 METALS = [
     {
@@ -29,8 +32,23 @@ METALS = [
 
 
 def get_all_metals():
-    """function for getting all metals"""
-    return METALS
+    """sql function for getting all metals"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        SELECT
+            m.id,
+            m.metal,
+            m.price
+        FROM metals m
+        """)
+        metals = []
+        dataset = db_cursor.fetchall()
+        for row in dataset:
+            metal = Metal(row['id'], row['metal'], row['price'])
+            metals.append(metal.__dict__)
+    return metals
 
 
 def get_single_metal(id):
@@ -40,3 +58,18 @@ def get_single_metal(id):
         if metal["id"] == id:
             requested_metal = metal
     return requested_metal
+
+def update_metal(id, new_metal):
+    """sql function for updating metal price"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        UPDATE Metals
+            SET
+                price = ?
+        WHERE id = ?
+        """, (new_metal['price'], id,))
+        rows_affected = db_cursor.rowcount
+    if rows_affected == 0:
+        return False
+    return True
