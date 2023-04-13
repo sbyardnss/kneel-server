@@ -5,3 +5,6 @@ class Order():
         self.style_id = style
         self.size_id = size
         self.metal_id = metal
+        self.metal = None
+        self.size = None
+        self.style = None

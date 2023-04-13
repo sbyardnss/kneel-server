@@ -1,6 +1,6 @@
 import json
 import sqlite3
-from models import Order
+from models import Order, Metal, Size, Style
 """order requests module"""
 ORDERS = [
     {
@@ -22,14 +22,35 @@ def get_all_orders():
             o.id,
             o.metal_id,
             o.size_id,
-            o.style_id
+            o.style_id,
+            m.metal metal_metal,
+            m.price metal_price,
+            s.carets size_carets,
+            s.price size_price,
+            t.style style_style,
+            t.price style_price
         FROM orders o
+        JOIN Metals m
+            ON o.metal_id = m.id
+        JOIN Sizes s
+            ON o.size_id = s.id
+        JOIN Styles t
+            ON o.style_id = t.id
         """)
         orders = []
         dataset = db_cursor.fetchall()
         for row in dataset:
             order = Order(row['id'], row['metal_id'],
                           row['size_id'], row['style_id'])
+            metal_exp = Metal(
+                row['metal_id'], row['metal_metal'], row['metal_price'])
+            order.metal = metal_exp.__dict__
+            size_exp = Size(
+                row['size_id'], row['size_carets'], row['size_price'])
+            order.size = size_exp.__dict__
+            style_exp = Style(
+                row['style_id'], row['style_style'], row['style_price'])
+            order.style = style_exp.__dict__
             orders.append(order.__dict__)
     return orders
 
