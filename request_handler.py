@@ -15,7 +15,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         if id is not None:
             response = retrieve(resource, id)
             if resource == "orders":
-                if query_params == "metal":
+                if query_params[0] == 'metal':
+                    print(query_params)
                     matching_metal = retrieve("metals", response["metalId"])
                     response["metal"] = matching_metal
                 if response is not None:
@@ -48,7 +49,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         # response = {"payload": post_body}
         post_body = json.loads(post_body)
         response = {}
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
         new_asset = None
         new_asset = create(resource, post_body)
         target_table = all(resource)
@@ -76,7 +77,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
         response = None
         target_table = all(resource)
         length = len(target_table)
@@ -103,7 +104,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_DELETE(self):
         """function for handling delete request"""
-        (resource, id) = self.parse_url(self.path)
+        (resource, id, query_params) = self.parse_url(self.path)
         if resource == "styles" or "sizes" or "orders" or "metals":
             self._set_headers(400)
             response = {
@@ -163,11 +164,11 @@ class HandleRequests(BaseHTTPRequestHandler):
         """function for url parse with query params"""
         url_components = urlparse(path)
         path_params = url_components.path.strip("/").split("/")
-        # query_params = url_components.query.split("&")
-        query_params = url_components.query
+        query_params = url_components.query.split("&")
+        # query_params = url_components.query
         resource = path_params[0]
         id = None
-        # print(url_components)
+        print(query_params)
         try:
             id = int(path_params[1])
         except IndexError:

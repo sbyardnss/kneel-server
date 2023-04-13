@@ -91,7 +91,7 @@ def retrieve(resource, id):
     requested_asset = None
     for asset in DATABASE[resource]:
         if asset["id"] == id:
-            requested_asset = asset
+            requested_asset = asset.copy()
     return requested_asset
 
 
