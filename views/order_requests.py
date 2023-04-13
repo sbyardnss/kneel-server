@@ -30,29 +30,40 @@ def get_all_orders():
         for row in dataset:
             order = Order(row['id'], row['metal_id'], row['size_id'], row['style_id'])
             orders.append(order.__dict__)
-    return ORDERS
+    return orders
 
 
 def get_single_order(id):
-    """function for getting single order"""
-    requested_order = None
-    for order in ORDERS:
-        if order["id"] == id:
-            requested_order = order
-    return requested_order
+    """sql function for getting single order"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        SELECT
+            o.id,
+            o.metal_id,
+            o.size_id,
+            o.style_id
+        FROM orders o
+        WHERE o.id = ?
+        """, ( id, ))
+        data = db_cursor.fetchone()
+        order = Order(data['id'], data['metal_id'], data['size_id'], data['style_id'])
+    return order.__dict__
 
 
 def create_order(order):
-    """function for creating a new order"""
-    # max_id = None
-    # if ORDERS[-1]["id"] is None:
-    #     max_id = 0
-    # else:
-    #     max_id = ORDERS[-1]["id"]
-    max_id = ORDERS[-1]["id"]
-    new_id = max_id + 1
-    order["id"] = new_id
-    ORDERS.append(order)
+    """sql function for creating a new order"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+        db_cursor.execute("""
+        INSERT INTO Orders
+            ( metal_id, size_id, style_id)
+        VALUES
+            (?, ?, ?);
+        """, (order['metal_id'], order['size_id'], order['style_id']))
+        id = db_cursor.lastrowid
+        order['id'] = id
     return order
 
 def delete_order(id):

@@ -39,3 +39,4 @@ INSERT INTO `Metals` VALUES (null, '14K Gold', 736.4);
 INSERT INTO `Metals` VALUES (null, '24K Gold', 1258.9);
 INSERT INTO `Metals` VALUES (null, 'Platinum', 795.45);
 INSERT INTO `Metals` VALUES (null, 'Palladium', 1241);
+
