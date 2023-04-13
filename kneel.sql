@@ -21,6 +21,8 @@ CREATE TABLE 'Orders' (
     'metal_id' INTEGER NOT NULL,
     'size_id' INTEGER NOT NULL,
     'style_id' INTEGER NOT NULL,
-    FOREIGN KEY ('metal_id')
+    FOREIGN KEY ('metal_id') REFERENCES 'Metals'('id')
+    FOREIGN KEY ('size_id') REFERENCES 'Sizes'('id')
+    FOREIGN KEY ('style_id') REFERENCES 'Styles'('id')
 );
 
