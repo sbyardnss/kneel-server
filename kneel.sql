@@ -25,4 +25,17 @@ CREATE TABLE 'Orders' (
     FOREIGN KEY ('size_id') REFERENCES 'Sizes'('id')
     FOREIGN KEY ('style_id') REFERENCES 'Styles'('id')
 );
-
+INSERT INTO `Orders` VALUES (null, 1, 3, 2);
+INSERT INTO `Styles` VALUES (null, 'Classic', 500);
+INSERT INTO `Styles` VALUES (null, 'Modern', 710);
+INSERT INTO `Styles` VALUES (null, 'Vintage', 965);
+INSERT INTO `Sizes` VALUES (null, 0.5, 405);
+INSERT INTO `Sizes` VALUES (null, 0.75, 782);
+INSERT INTO `Sizes` VALUES (null, 1, 1470);
+INSERT INTO `Sizes` VALUES (null, 1.5, 1997);
+INSERT INTO `Sizes` VALUES (null, 2, 3638);
+INSERT INTO `Metals` VALUES (null, 'Sterling Silver', 12.42);
+INSERT INTO `Metals` VALUES (null, '14K Gold', 736.4);
+INSERT INTO `Metals` VALUES (null, '24K Gold', 1258.9);
+INSERT INTO `Metals` VALUES (null, 'Platinum', 795.45);
+INSERT INTO `Metals` VALUES (null, 'Palladium', 1241);
