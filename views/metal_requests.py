@@ -31,18 +31,26 @@ METALS = [
 ]
 
 
-def get_all_metals():
+def get_all_metals(query_params):
     """sql function for getting all metals"""
     with sqlite3.connect("./kneel.sqlite3") as conn:
         conn.row_factory = sqlite3.Row
         db_cursor = conn.cursor()
-        db_cursor.execute("""
-        SELECT
-            m.id,
-            m.metal,
-            m.price
-        FROM metals m
-        """)
+        sortBy = ""
+        if len(query_params) != 0:
+            if query_params['_sortBy']:
+                print(query_params['_sortBy'])
+                if query_params['_sortBy'][0] == 'price':
+                    sortBy = "ORDER BY m.price"
+        sql_to_execute = f"""
+            SELECT
+                m.id,
+                m.metal,
+                m.price
+            FROM metals m
+            {sortBy}
+            """
+        db_cursor.execute(sql_to_execute)
         metals = []
         dataset = db_cursor.fetchall()
         for row in dataset:

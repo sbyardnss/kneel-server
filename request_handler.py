@@ -1,6 +1,7 @@
 """main module"""
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
 from views import get_all_styles, get_all_metals, get_all_sizes, get_all_orders, get_single_order, get_single_style, get_single_metal, get_single_size, create_order, delete_order, update_order, update_metal
 
 
@@ -11,13 +12,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         """Handles GET requests to the server """
         self._set_headers(200)
         response = {}
-        (resource, id) = self.parse_url(self.path)
-
+        (resource, id, query_params) = self.parse_url(self.path)
         if resource == "metals":
             if id is not None:
                 response = get_single_metal(id)
             else:
-                response = get_all_metals()
+                response = get_all_metals(query_params)
         elif resource == "sizes":
             if id is not None:
                 response = get_single_size(id)
@@ -33,8 +33,6 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_single_order(id)
             else:
                 response = get_all_orders()
-        # else:
-        #     response = []
 
 
         self.wfile.write(json.dumps(response).encode())
@@ -108,16 +106,30 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def parse_url(self, path):
         """turns url for requested animal into tuple"""
-        path_params = path.split("/")
-        resource = path_params[1]
+        # path_params = path.split("/")
+        # resource = path_params[1]
+        # id = None
+        # try:
+        #     id = int(path_params[2])
+        # except IndexError:
+        #     pass
+        # except ValueError:
+        #     pass
+        # return (resource, id)
+        url_components = urlparse(path)
+        path_params = url_components.path.strip("/").split("/")
+        query_params = []
+        if url_components.query != '':
+            query_params = parse_qs(url_components.query)
+        resource = path_params[0]
         id = None
         try:
-            id = int(path_params[2])
+            id = int(path_params[1])
         except IndexError:
             pass
         except ValueError:
             pass
-        return (resource, id)
+        return (resource, id, query_params)
 
 # point of this application.
 
