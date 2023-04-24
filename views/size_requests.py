@@ -1,3 +1,6 @@
+import json
+import sqlite3
+from models import Size
 """size requests module"""
 SIZES = [
     {
@@ -27,9 +30,38 @@ SIZES = [
     }
 ]
 
-def get_all_sizes():
-    """function for getting all sizes"""
-    return SIZES
+
+def get_all_sizes(query_params):
+    """sql function for getting all sizes"""
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+        sortBy = ""
+        if len(query_params) != 0:
+            if query_params['_sortBy']:
+                print(query_params['_sortBy'])
+                if query_params['_sortBy'][0] == 'price':
+                    sortBy = "ORDER BY s.price"
+        sql_to_execute = f"""
+            SELECT
+                s.id,
+                s.carets,
+                s.price
+            FROM SIZES s
+            {sortBy}
+            """
+        db_cursor.execute(sql_to_execute)
+        sizes = []
+        dataset = db_cursor.fetchall()
+        for row in dataset:
+            size = Size(row['id'], row['carets'], row['price'])
+            sizes.append(size.__dict__)
+    return sizes
+
+# def get_all_sizes():
+#     """function for getting all sizes"""
+#     return SIZES
+
 
 def get_single_size(id):
     """function for getting single size"""

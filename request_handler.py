@@ -22,12 +22,12 @@ class HandleRequests(BaseHTTPRequestHandler):
             if id is not None:
                 response = get_single_size(id)
             else:
-                response = get_all_sizes()
+                response = get_all_sizes(query_params)
         elif resource == "styles":
             if id is not None:
                 response = get_single_style(id)
             else:
-                response = get_all_styles()
+                response = get_all_styles(query_params)
         elif resource == "orders":
             if id is not None:
                 response = get_single_order(id)
